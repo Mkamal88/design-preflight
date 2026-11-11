@@ -1,0 +1,14 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local secrets and logs
+.env
+.env.*
+*.log
+
+# Reports generated while testing the skill
+docs/preflight/

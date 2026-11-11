@@ -1,0 +1,13 @@
+{
+  "name": "design-preflight",
+  "version": "0.1.0",
+  "description": "Evidence-based design review of a ticket or spec against the real codebase: database, latency, architecture, security and reliability, with decision records for proposals that challenge project rules.",
+  "author": {
+    "name": "Mohamed Kamal",
+    "url": "https://github.com/Mkamal88"
+  },
+  "homepage": "https://github.com/Mkamal88/design-preflight",
+  "repository": "https://github.com/Mkamal88/design-preflight",
+  "license": "MIT",
+  "keywords": ["design-review", "architecture", "database", "performance", "jira", "github-issues", "spec-review"]
+}

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint shell scripts
+        run: shellcheck --severity=warning install.sh scripts/*.sh skills/design-preflight/scripts/*.sh
+
+      - name: Validate the skill
+        run: ./scripts/validate.sh
+
+      - name: Run stack detection on this repository
+        run: ./skills/design-preflight/scripts/detect_stack.sh .
+
+      - name: Test install and uninstall
+        env:
+          CLAUDE_SKILLS_DIR: ${{ runner.temp }}/claude-skills
+          CODEX_SKILLS_DIR: ${{ runner.temp }}/codex-skills
+        run: |
+          ./install.sh --all
+          test -f "$CLAUDE_SKILLS_DIR/design-preflight/SKILL.md"
+          test -f "$CODEX_SKILLS_DIR/design-preflight/SKILL.md"
+          ./install.sh --all --uninstall
+          test ! -e "$CLAUDE_SKILLS_DIR/design-preflight"
+          test ! -e "$CODEX_SKILLS_DIR/design-preflight"
