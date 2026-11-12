@@ -17,16 +17,37 @@
 
 Every finding points to a file and line, or to a measurement. When the best design needs one of your team's rules changed (for example "add Redis" or "add a queue"), the skill still says so, in a separate section, as a short decision record with the cost and the best option that stays within your rules.
 
-```text
+```markdown
 > /design-preflight ACME-142
 
-Verdict: Ready with changes
+# Design preflight: ACME-142 — Export invoices to CSV
+Source: Jira ACME-142 · Mode: pre · Scale assumed: 120 tenants, largest 400k invoices
 
-| # | Severity | Finding                                   | Evidence                        | Effort |
-|---|----------|-------------------------------------------|---------------------------------|--------|
-| 1 | Blocker  | Export runs inside the HTTP request       | src/invoices/router.ts:88       | M      |
-| 2 | Should   | No index for (tenant_id, issued_at)       | EXPLAIN: 2.1 s → 14 ms          | S      |
-| 3 | Should   | N+1 on customer names                     | src/invoices/service.ts:140     | S      |
+## Verdict: Ready with changes
+The export can use the existing job worker, but as written it loads every invoice
+inside the request. Moving it to a background job is the one change that matters most.
+
+| # | Severity | Finding                             | Evidence                               | Fix                         | Effort | Priority |
+|---|----------|-------------------------------------|----------------------------------------|-----------------------------|--------|----------|
+| 1 | Blocker  | Export runs inside the HTTP request | src/invoices/router.ts:88 (Observed)   | Background job + streaming  | M      | 10       |
+| 2 | Should   | No index for (tenant_id, issued_at) | EXPLAIN: 2.1 s → 14 ms (Measured)      | Composite index             | S      | 20       |
+| 3 | Should   | N+1 on customer names               | src/invoices/service.ts:140 (Observed) | One query with a join       | S      | 16       |
+
+### 1. Export runs inside the HTTP request
+- Where: src/invoices/router.ts:88 · Lens: latency · Evidence: Observed
+- Problem: 400k rows (about 180 MB) built in memory; the load balancer times out at 60 s.
+- Fix: an invoice_export job on the existing jobs table, rows streamed to storage in batches.
+- Verify by: a test with 50k seeded invoices keeps memory under 100 MB.
+
+## Changes to propose for the spec
+- Criterion 2 "export is fast" cannot be tested → "100k invoices export within 2 minutes."
+- Missing: who may export, and whether cancelled invoices are included.
+
+## Constraint-challenging proposals
+P-1: Managed queue (SQS). Not needed at this scale → adopt when jobs pass 50 per second.
+
+## Not checked
+Frontend download flow (no design attached), storage costs.
 ```
 
 See the full [example report](examples/example-report.md).
