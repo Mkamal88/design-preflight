@@ -20,6 +20,8 @@ Goal: get the whole spec, with its context, into a Spec Card. Try the adapters i
 2. **A CLI**, if installed and already signed in: `jira issue view ABC-123 --comments 20` (jira-cli) or `acli jira workitem view ABC-123` (Atlassian CLI).
 3. **Ask the user to paste the ticket.** Never ask the user to paste an API token into the chat.
 
+When you search for several issues (batch mode, or to help the user pick one), ask only for the fields you need, such as `summary`, `status` and `issuetype`. A search that returns every field can be hundreds of thousands of characters. Fetch the full fields for one issue at a time.
+
 ## GitHub
 
 ```bash

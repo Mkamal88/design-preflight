@@ -1,6 +1,6 @@
 {
   "name": "design-preflight",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Evidence-based design review of a ticket or spec against the real codebase: database, latency, architecture, security and reliability, with decision records for proposals that challenge project rules.",
   "author": {
     "name": "Mohamed Kamal",

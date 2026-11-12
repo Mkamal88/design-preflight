@@ -9,7 +9,7 @@
       "name": "design-preflight",
       "source": "./",
       "description": "Evidence-based design review of a ticket or spec against the real codebase.",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }

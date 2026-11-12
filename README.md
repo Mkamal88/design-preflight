@@ -4,11 +4,16 @@
 
 `design-preflight` is a skill for AI coding agents ([Claude Code](https://claude.com/claude-code) and [OpenAI Codex](https://github.com/openai/codex)). Give it a ticket (Jira, GitHub, GitLab, Linear, a Markdown file or pasted text). It reads the ticket, finds the code the ticket touches, and tells you how to build it better:
 
-- 🗄️ **Database:** missing indexes, N+1 queries, unsafe migrations, transactions that hold locks during network calls
-- ⚡ **Latency:** slow request paths, work that belongs in the background, caching that actually fits
-- 🏛️ **Architecture:** fit with existing patterns, module boundaries, hard-coded values, idempotency
-- 🔒 **Security:** authorisation, tenant isolation, data exposure
-- 🧪 **Reliability:** tests for each acceptance criterion, rollback, failure modes, observability
+- 🗄️ **Database:** missing indexes, N+1 queries, unsafe migrations, transactions that hold locks during network calls.
+  *Example: a ticket adds "filter orders by customer", but the table has no index on `customer_id`.*
+- ⚡ **Latency:** slow request paths, work that belongs in the background, caching that actually fits.
+  *Example: "send a welcome email on sign-up" is planned inside the request, adding about 400 ms to every sign-up.*
+- 🏛️ **Architecture:** fit with existing patterns, module boundaries, hard-coded values, idempotency.
+  *Example: the ticket would add a second HTTP client when the project already wraps one in `lib/http.ts`.*
+- 🔒 **Security:** authorisation, tenant isolation, data exposure.
+  *Example: a new `GET /invoices/:id` checks the role, but not that the invoice belongs to the caller's company.*
+- 🧪 **Reliability:** tests for each acceptance criterion, rollback, failure modes, observability.
+  *Example: "the import can be retried" has no test, and a retry would create duplicate rows.*
 
 Every finding points to a file and line, or to a measurement. When the best design needs one of your team's rules changed (for example "add Redis" or "add a queue"), the skill still says so, in a separate section, as a short decision record with the cost and the best option that stays within your rules.
 
@@ -145,16 +150,16 @@ Without any of these, paste the ticket text and the skill works the same way.
 
 Write them after the ticket, or say them in plain words ("be strict", "only the database").
 
-| Option | What it does |
-|---|---|
-| *(none)* | Pre-implementation review of the ticket against the code |
-| `--diff [base]` | Review the current branch against the ticket: which acceptance criteria are done, partial, missing or untested, plus scope creep |
-| `--batch <query>` | Review several tickets (a JQL query, a `gh` search or a list) and rank them by risk |
-| `--lens db,latency` | Run only some lenses: `db`, `latency`, `arch`, `security`, `reliability` |
-| `--strict` | Only advice that fits your current rules |
-| `--open` | Think freely, including bigger and more speculative design changes |
-| `--measure` | Run safe local measurements: `EXPLAIN` on your local database, query counts in tests |
-| `--save` | Save the report to `docs/preflight/<ticket>.md` |
+| Option | What it does | When to use it |
+|---|---|---|
+| *(none)* | Pre-implementation review of the ticket against the code | You picked up a ticket and want to know the best way to build it before you start. |
+| `--diff [base]` | Review the current branch against the ticket: which acceptance criteria are done, partial, missing or untested, plus scope creep | Before opening a pull request, to catch a criterion you forgot. |
+| `--batch <query>` | Review several tickets (a JQL query, a `gh` search or a list) and rank them by risk | At sprint planning, to see which tickets need a design talk first. |
+| `--lens db,latency` | Run only some lenses: `db`, `latency`, `arch`, `security`, `reliability` | The ticket is a new report, so only the database and speed matter. |
+| `--strict` | Only advice that fits your current rules | Close to a release, when new infrastructure is not an option. |
+| `--open` | Think freely, including bigger and more speculative design changes | Planning the next release and open to bigger changes. |
+| `--measure` | Run safe local measurements: `EXPLAIN` on your local database, query counts in tests | You need numbers to convince the team that an index or a fix is worth it. |
+| `--save` | Save the report to `docs/preflight/<ticket>.md` | You want to attach the report to the pull request or share it with the team. |
 
 ## Project profile
 
