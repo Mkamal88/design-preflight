@@ -13,19 +13,27 @@ Source: <link> · Mode: <pre | diff | batch> · Date: <YYYY-MM-DD> · Scale assu
 
 ## Top findings
 
-| # | Severity | Finding | Evidence | Fix | Effort | Priority |
-|---|---|---|---|---|---|---|
-| 1 | Blocker | ... | `path:line` (Observed) | ... | S | 20 |
+| # | Severity | Finding | Evidence | Fix | Effort | Priority | Status |
+|---|---|---|---|---|---|---|---|
+| 1 | Blocker | ... | `path:line` (Observed) | ... | S | 20 | Open |
 
 ### 1. <finding title>
 
-- **Where:** `path:line` · **Lens:** db · **Evidence:** Measured / Observed / Inferred
+- **Where:** `path:line` · **Lens:** db · **Evidence:** Measured / Observed / Inferred · **Status:** Open / In PR #n / Conflicts with PR #n
 - **Problem:** ...
 - **Why it matters here:** ... (at the stated scale)
 - **Fix:** ... (specific: the index columns, the query, the function)
 - **Verify by:** the test or measurement that proves the fix
 
 (Up to 5 findings in this section.)
+
+## In-flight work
+
+| PR | Item | Branch → base | Draft | Overlaps this spec | Note |
+|---|---|---|---|---|---|
+| #57 | ABC-120 (parent) | `abc-120-audit-model` → `main` | No | `prisma/schema.prisma` | Adds the same index as finding 3 |
+
+<Or: "No open pull requests found for ABC-123 or its N linked items (searched with gh).">
 
 ## Changes to propose for the spec
 
@@ -64,6 +72,8 @@ Source: <link> · Mode: <pre | diff | batch> · Date: <YYYY-MM-DD> · Scale assu
 ## Rules
 
 - Sort by priority, with Blockers first.
+- A finding already fixed in an open pull request stays in the report with status `In PR #n`, so the reviewer of that pull request can check it.
+- A conflict between two open pull requests is a finding of its own.
 - One finding is one problem. Merge duplicates that came from different lenses.
 - Fixes are specific: name the columns, the query, the function, the file.
 - Keep it short. A reviewer should read the verdict and top findings in under three minutes.

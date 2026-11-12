@@ -15,6 +15,9 @@
 - 🧪 **Reliability:** tests for each acceptance criterion, rollback, failure modes, observability.
   *Example: "the import can be retried" has no test, and a retry would create duplicate rows.*
 
+It also looks at **work in flight**: open pull requests that are not merged yet, for the ticket and for the tickets linked to it (parent, sub-tasks, blockers, related). Findings an open pull request already fixes are marked `In PR #n`, and clashes are flagged before merge.
+*Example: the parent ticket's open PR adds an index on `invoices(tenant_id)`, and this ticket plans a second, overlapping one.*
+
 Every finding points to a file and line, or to a measurement. When the best design needs one of your team's rules changed (for example "add Redis" or "add a queue"), the skill still says so, in a separate section, as a short decision record with the cost and the best option that stays within your rules.
 
 ```markdown
@@ -27,17 +30,22 @@ Source: Jira ACME-142 · Mode: pre · Scale assumed: 120 tenants, largest 400k i
 The export can use the existing job worker, but as written it loads every invoice
 inside the request. Moving it to a background job is the one change that matters most.
 
-| # | Severity | Finding                             | Evidence                               | Fix                         | Effort | Priority |
-|---|----------|-------------------------------------|----------------------------------------|-----------------------------|--------|----------|
-| 1 | Blocker  | Export runs inside the HTTP request | src/invoices/router.ts:88 (Observed)   | Background job + streaming  | M      | 10       |
-| 2 | Should   | No index for (tenant_id, issued_at) | EXPLAIN: 2.1 s → 14 ms (Measured)      | Composite index             | S      | 20       |
-| 3 | Should   | N+1 on customer names               | src/invoices/service.ts:140 (Observed) | One query with a join       | S      | 16       |
+| # | Severity | Finding                             | Evidence                               | Fix                         | Effort | Priority | Status              |
+|---|----------|-------------------------------------|----------------------------------------|-----------------------------|--------|----------|---------------------|
+| 1 | Blocker  | Export runs inside the HTTP request | src/invoices/router.ts:88 (Observed)   | Background job + streaming  | M      | 10       | Open                |
+| 2 | Should   | No index for (tenant_id, issued_at) | EXPLAIN: 2.1 s → 14 ms (Measured)      | Composite index             | S      | 20       | Conflicts with #57  |
+| 3 | Should   | N+1 on customer names               | src/invoices/service.ts:140 (Observed) | One query with a join       | S      | 16       | Open                |
 
 ### 1. Export runs inside the HTTP request
-- Where: src/invoices/router.ts:88 · Lens: latency · Evidence: Observed
+- Where: src/invoices/router.ts:88 · Lens: latency · Evidence: Observed · Status: Open
 - Problem: 400k rows (about 180 MB) built in memory; the load balancer times out at 60 s.
 - Fix: an invoice_export job on the existing jobs table, rows streamed to storage in batches.
 - Verify by: a test with 50k seeded invoices keeps memory under 100 MB.
+
+## In-flight work
+| PR  | Item              | Branch → base           | Overlaps             | Note                               |
+|-----|-------------------|-------------------------|----------------------|------------------------------------|
+| #57 | ACME-140 (parent) | acme-140-filters → main | prisma/schema.prisma | Adds index (tenant_id) only; see 2 |
 
 ## Changes to propose for the spec
 - Criterion 2 "export is fast" cannot be tested → "100k invoices export within 2 minutes."
@@ -167,6 +175,8 @@ What's the best way to build ACME-142 in this codebase? Only look at the databas
 
 Without any of these, paste the ticket text and the skill works the same way.
 
+To find open pull requests for the ticket and its linked tickets, the skill uses `gh` or `glab` (or the tracker's development links). Without them it falls back to remote branch names that contain the key, and says in "Not checked" what it could not search.
+
 ## Options
 
 Write them after the ticket, or say them in plain words ("be strict", "only the database").
@@ -208,10 +218,11 @@ The full template is in [`project-profile-template.md`](skills/design-preflight/
 ## How it works
 
 ```text
- Ticket or spec ──► 1. Intake        Jira / GitHub / GitLab / Linear / file / text → Spec Card
+ Ticket or spec ──► 1. Intake        Jira / GitHub / GitLab / Linear / file / text → Spec Card,
+                                     plus open PRs for the ticket and its linked tickets
                     2. Stack         detect_stack.sh: languages, ORM, database, cache, jobs
                     3. Change map    entry points, models, services, closest existing pattern, tests
-                    4. Gap analysis  already built? conflicts? missing cases? untestable criteria?
+                    4. Gap analysis  already built or in an open PR? conflicts? missing cases? untestable criteria?
                     5. Lenses        db · latency · arch · security · reliability (in parallel when possible)
                     6. Measure       optional, local only
                     7. Score         impact × confidence ÷ effort

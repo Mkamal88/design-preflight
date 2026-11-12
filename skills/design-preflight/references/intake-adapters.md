@@ -49,6 +49,37 @@ Use a Linear MCP tool if one is connected. Otherwise ask the user to paste the i
 
 Read the whole thing. Use the agent's document tools for PDF or Word files, and its web tools for pages. If a page needs a sign-in you do not have, ask the user to paste it.
 
+## In-flight work: open pull requests
+
+Code that is written but not merged is part of the picture. Before you judge the spec, look for open pull requests (or merge requests) for **this item and the items linked to it**: parent or epic, sub-tasks, blockers, "blocked by", "relates to" and duplicates from the Spec Card. Cap the linked items at about 10, nearest first (sub-tasks and blockers before "relates to").
+
+Search each key or issue number in this order and stop when one source works:
+
+1. **The tracker's development links.** Jira shows linked branches and pull requests on the issue (the development panel, or remote links). Use them when the MCP tool or CLI returns them.
+2. **The code host CLI**, from the repository root:
+
+   ```bash
+   gh pr list --state open --search "ABC-123" --json number,title,headRefName,baseRefName,author,isDraft,updatedAt,url
+   gh pr list --state open --search "ABC-123 in:title,body" --json number,title,headRefName,url
+   glab mr list --state opened --search "ABC-123"
+   ```
+
+   For a GitHub issue, also check the pull requests that reference it: `gh issue view 123 --json closedByPullRequestsReferences` (newer `gh`), or search `"#123"`.
+3. **Branch names**, when there is no code host CLI: `git branch -r --list "*ABC-123*"` after `git fetch --prune` (ask first if fetching is slow or needs credentials). A branch without a pull request is still in-flight work.
+
+Match keys as whole words (`ABC-12` must not match `ABC-123`). Leave out merged, closed and stale pull requests (no update for 60 days or more), and say how many you left out.
+
+For each pull request you keep, read:
+
+- the title, description, base branch, draft status and last update
+- the changed files: `gh pr view <n> --json files` or `gh pr diff <n> --name-only`
+- the diff of the files that overlap the Change Map: `gh pr diff <n>`. For a large diff, read the migrations, schema, routes and services first.
+- open review comments that discuss design: `gh pr view <n> --comments`
+
+Do not check out, rebase, comment on or approve these pull requests. Reading is enough.
+
+Record them in the Spec Card under "In-flight work". If no tool can search pull requests, write that in "Not checked".
+
 ## Spec Card
 
 ```text
@@ -60,6 +91,7 @@ Non-functional requirements (latency, scale, security, compliance):
 Out of scope:
 Linked items (parent, blockers, related):
 Decisions already made (from comments or linked pages):
+In-flight work (open PRs for this item and linked items: number, item, branch, draft?, files that overlap):
 Open questions and ambiguities:
 ```
 

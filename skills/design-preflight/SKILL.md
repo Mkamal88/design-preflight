@@ -67,6 +67,8 @@ If no scale is stated and performance matters for this spec, ask one question wi
 
 Fetch the spec with the right adapter (`references/intake-adapters.md`) and turn it into a **Spec Card**: goal, acceptance criteria, non-functional requirements, out of scope, linked items, decisions already made, open questions. Flag ambiguous and untestable criteria at this point.
 
+Then find **in-flight work**: open, unmerged pull requests for this item and for the items linked to it (parent, sub-tasks, blockers, related). Read their changed files and the diffs that touch this spec's area. See "In-flight work" in `references/intake-adapters.md`.
+
 ### Step 2: Detect the stack
 
 Run `scripts/detect_stack.sh <repo-root>` from this skill's folder. If you cannot run scripts, read the manifests (`package.json`, `pyproject.toml`, `go.mod`, `pom.xml` and so on) yourself. Use `references/stack-detection.md` to choose stack-specific checks, query-logging switches and EXPLAIN syntax.
@@ -80,6 +82,7 @@ Search and read; do not guess. Find:
 - the services and modules on the path, and how they call each other
 - the existing pattern for similar features (the closest earlier feature is the best reference)
 - the tests that cover the area today
+- the open pull requests from Step 1 that touch these files, kept apart from the merged code
 
 List them with paths. The Change Map is part of the report.
 
@@ -89,8 +92,9 @@ In a large codebase, if you can start subagents, let them do the wide search, bu
 
 Compare the Spec Card with the Change Map:
 
-- Is any of it already built, fully or partly?
+- Is any of it already built, fully or partly? Count merged code as built and open pull requests as in progress.
 - Does it conflict with existing behaviour, data or rules?
+- Do open pull requests for this item or linked items overlap or conflict with it, or with each other? Look for two migrations on the same table, the same index or column added twice, a route or contract changed in two places, and work this spec plans that a linked pull request already does.
 - What is missing from the spec: edge cases, permissions, migration or backfill, failure handling, non-functional needs?
 - Which acceptance criteria cannot be verified as written? Propose a testable wording.
 
@@ -128,6 +132,8 @@ For each finding, set:
 - **Priority** = Impact × Confidence ÷ Effort
 - **Severity**: `Blocker` (the spec will fail or cause harm as written), `Should` (a clear gain, do it in this ticket), `Consider` (worth a follow-up)
 
+Give each finding a status against in-flight work: `Open` (nobody is on it), `In PR #n` (an open pull request already fixes it; lower its priority and name the pull request), or `Conflicts with PR #n` (an open pull request does it differently or makes it worse; raise it, since it is cheaper to fix before merge).
+
 Then mark each finding as **within-rules** or **constraint-challenging** (see `references/constraint-challenging.md`). A constraint-challenging proposal needs evidence of a real problem at the stated scale, the rule it affects, its gains and running costs, and the best within-rules alternative.
 
 ### Step 8: Report
@@ -144,7 +150,7 @@ Use `references/report-template.md`. Put at most 5 findings, the highest priorit
 
 ## `--diff` mode
 
-Follow the same steps, but build the Change Map from `git diff <base>...HEAD` and the files it touches. Add a **Spec coverage** table: each acceptance criterion → where it is implemented → where it is tested → status (`Done`, `Partial`, `Missing`, `Untested`). Flag changes that are not in the spec (scope creep) and changes that break the project's rules.
+Follow the same steps, but build the Change Map from `git diff <base>...HEAD` and the files it touches. Leave the current branch's own pull request out of in-flight work, and still check the open pull requests of linked items against this diff. Add a **Spec coverage** table: each acceptance criterion → where it is implemented → where it is tested → status (`Done`, `Partial`, `Missing`, `Untested`). Flag changes that are not in the spec (scope creep) and changes that break the project's rules.
 
 ## `--batch` mode
 
@@ -156,4 +162,5 @@ Run Steps 0 to 2 once. For each item, run a shallow version of Steps 3 to 7: the
 - No generic advice that would be true of any project ("add caching", "add indexes") without the specific place, query and reason.
 - The recommendations respect the project's stack and patterns, or say clearly why they should not.
 - Each constraint-challenging proposal shows a within-rules alternative.
+- Open pull requests for the item and its linked items were searched, or the report says why not.
 - The report says what you did not check.

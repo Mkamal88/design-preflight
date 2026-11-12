@@ -2,6 +2,13 @@
 
 All notable changes to this project are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-11-12
+
+### Added
+
+- In-flight work: the skill finds open, unmerged pull requests for the item and its linked items (parent, sub-tasks, blockers, related) with `gh`, `glab`, tracker development links or branch names, and reads their diffs.
+- Each finding has a status: `Open`, `In PR #n` or `Conflicts with PR #n`. The report has an "In-flight work" section.
+
 ## [0.1.1] - 2026-11-12
 
 ### Changed
