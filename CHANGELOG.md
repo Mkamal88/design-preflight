@@ -2,6 +2,12 @@
 
 All notable changes to this project are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-11-13
+
+### Added
+
+- The report opens with "What the ticket asks": two or three plain lines on what the ticket asks for in business terms, so a misreading is caught before the findings. An unclear goal is said there instead of guessed.
+
 ## [0.2.0] - 2026-11-12
 
 ### Added

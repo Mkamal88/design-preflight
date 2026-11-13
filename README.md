@@ -26,6 +26,11 @@ Every finding points to a file and line, or to a measurement. When the best desi
 # Design preflight: ACME-142 — Export invoices to CSV
 Source: Jira ACME-142 · Mode: pre · Scale assumed: 120 tenants, largest 400k invoices
 
+## What the ticket asks
+Finance managers need to download all invoices for a date range as a CSV,
+so they can reconcile them in their accounting tool without asking support.
+Who uses it: finance managers in each tenant · Out of scope: PDF export
+
 ## Verdict: Ready with changes
 The export can use the existing job worker, but as written it loads every invoice
 inside the request. Moving it to a background job is the one change that matters most.
@@ -226,7 +231,7 @@ The full template is in [`project-profile-template.md`](skills/design-preflight/
                     5. Lenses        db · latency · arch · security · reliability (in parallel when possible)
                     6. Measure       optional, local only
                     7. Score         impact × confidence ÷ effort
-                    8. Report        verdict, top 5 findings, spec changes, decision records
+                    8. Report        what the ticket asks, verdict, top 5 findings, spec changes, decision records
 ```
 
 Each lens is a separate reference file that the agent reads only when it runs that lens. This keeps the agent's context small and makes the lenses easy to improve one at a time.

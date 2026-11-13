@@ -7,6 +7,11 @@ Fill in this structure. Leave out sections that are empty, except "Not checked".
 
 Source: <link> · Mode: <pre | diff | batch> · Date: <YYYY-MM-DD> · Scale assumed: <...>
 
+## What the ticket asks
+
+<Two sentences in business terms: who needs what, and why.>
+Who uses it: <...> · Out of scope: <... only if the ticket says>
+
 ## Verdict: <Ready | Ready with changes | Needs rework>
 
 <Two or three sentences: the main reason, and the single most important change.>
@@ -71,6 +76,7 @@ Source: <link> · Mode: <pre | diff | batch> · Date: <YYYY-MM-DD> · Scale assu
 
 ## Rules
 
+- "What the ticket asks" is at most three lines, in plain business language: no code, tables or endpoints, and no copy of the description or the acceptance criteria. It is your own understanding, so the reader can catch a misreading before the findings. If the goal is unclear or can be read two ways, write that here instead of guessing, and add it to "Changes to propose for the spec".
 - Sort by priority, with Blockers first.
 - A finding already fixed in an open pull request stays in the report with status `In PR #n`, so the reviewer of that pull request can check it.
 - A conflict between two open pull requests is a finding of its own.

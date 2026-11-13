@@ -138,7 +138,7 @@ Then mark each finding as **within-rules** or **constraint-challenging** (see `r
 
 ### Step 8: Report
 
-Use `references/report-template.md`. Put at most 5 findings, the highest priority ones, in the top section and the rest in the appendix. Start with the verdict: `Ready`, `Ready with changes` or `Needs rework`.
+Use `references/report-template.md`. Open with **What the ticket asks**: two or three plain lines on who needs what and why, in business terms, from the Spec Card's goal. If you cannot state the goal clearly, say so there. Then the verdict: `Ready`, `Ready with changes` or `Needs rework`. Put at most 5 findings, the highest priority ones, in the top section and the rest in the appendix.
 
 ### Step 9: Offer follow-ups (do nothing without a yes)
 
@@ -158,6 +158,7 @@ Run Steps 0 to 2 once. For each item, run a shallow version of Steps 3 to 7: the
 
 ## Check before you answer
 
+- The report opens with a short business summary of the ticket, not a copy of it.
 - Every finding has evidence, or is labelled `Needs measurement` with how to measure it.
 - No generic advice that would be true of any project ("add caching", "add indexes") without the specific place, query and reason.
 - The recommendations respect the project's stack and patterns, or say clearly why they should not.

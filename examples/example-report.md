@@ -4,6 +4,11 @@
 
 Source: Jira ACME-142 · Mode: pre · Date: 2026-11-12 · Scale assumed: 120 tenants, largest tenant 400k invoices
 
+## What the ticket asks
+
+Finance managers need to download all invoices for a date range as a CSV file, so they can reconcile them in their accounting tool without asking support for an export.
+Who uses it: finance managers in each tenant · Out of scope: PDF export
+
 ## Verdict: Ready with changes
 
 The export can be built on the existing job worker, but as written it loads every invoice into memory inside the request and filters by a column with no index. Moving it to a background job with a streamed, keyset-paginated query is the one change that matters most.
